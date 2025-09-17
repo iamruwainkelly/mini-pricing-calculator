@@ -1,0 +1,14 @@
+{
+  "name": "mini-pricing-calculator",
+  "version": "1.0.0",
+  "description": "A web-based fuel pricing calculator",
+  "main": "index.html",
+  "scripts": {
+    "dev": "vercel dev",
+    "build": "echo 'Static site - no build needed'",
+    "start": "vercel dev"
+  },
+  "keywords": ["pricing", "calculator", "fuel", "web"],
+  "author": "RUWΔIN KΞLLY",
+  "license": "MIT"
+}

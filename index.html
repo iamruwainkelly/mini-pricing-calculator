@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini Pricing Calculator</title>
+    <!-- Version: C# Alignment Fix v3.0 - September 17, 2025 17:45 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mini Pricing Calculator</title>
+    <style>
+        /* Mini Fuel Pricing Calculator Styles */
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+
+        .calculator-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .calculator-header {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            padding: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            color: white;
+        }
+
+        .header-icon {
+            font-size: 2.5rem;
+        }
+
+        .calculator-header h1 {
+            margin: 0;
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+
+        form {
+            padding: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #374151;
+            font-size: 1rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            background-color: #f9fafb;
+            box-sizing: border-box;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+            background-color: white;
+        }
+
+        .calculate-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            border: none;
+            padding: 16px 24px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .calculate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.3);
+        }
+
+        .calculate-btn:active {
+            transform: translateY(0);
+        }
+
+        .result-container {
+            margin: 30px;
+            padding: 25px;
+            background: #f8fafc;
+            border-radius: 8px;
+            border-left: 4px solid #6366f1;
+            display: none;
+        }
+
+        .result-container h2 {
+            margin: 0 0 20px 0;
+            color: #1f2937;
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .result-row:last-of-type {
+            border-bottom: none;
+            margin-bottom: 15px;
+        }
+
+        .result-label {
+            font-weight: 500;
+            color: #4b5563;
+            flex: 1;
+        }
+
+        .result-value {
+            font-weight: 600;
+            color: #1f2937;
+            text-align: right;
+        }
+
+        .result-value.discount {
+            color: #ef4444;
+        }
+
+        .final-price {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-top: 20px;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            background: #f9fafb;
+            color: #6b7280;
+            font-size: 0.9rem;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .calculator-container {
+                margin: 0;
+            }
+            
+            .calculator-header {
+                padding: 20px;
+            }
+            
+            .calculator-header h1 {
+                font-size: 1.5rem;
+            }
+            
+            form {
+                padding: 20px;
+            }
+            
+            .result-container {
+                margin: 20px;
+                padding: 20px;
+            }
+            
+            .result-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+            }
+            
+            .result-value {
+                text-align: left;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator-container">
+        <div class="calculator-header">
+            <div class="header-icon">⛽</div>
+            <h1>Mini Pricing Calculator</h1>
+        </div>
+
+        <form id="calculatorForm">
+            <div class="form-group">
+                <label for="customerTier">Customer Price Tier (1-14):</label>
+                <select id="customerTier" class="form-control" required>
+                    <option value="">Select a tier...</option>
+                    <option value="1">Tier 1 (Premium)</option>
+                    <option value="2">Tier 2</option>
+                    <option value="3">Tier 3</option>
+                    <option value="4">Tier 4</option>
+                    <option value="5">Tier 5</option>
+                    <option value="6">Tier 6</option>
+                    <option value="7">Tier 7</option>
+                    <option value="8">Tier 8</option>
+                    <option value="9">Tier 9</option>
+                    <option value="10">Tier 10</option>
+                    <option value="11">Tier 11</option>
+                    <option value="12">Tier 12</option>
+                    <option value="13">Tier 13</option>
+                    <option value="14">Tier 14 (Standard)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="country">Country:</label>
+                <select id="country" class="form-control" required>
+                    <option value="">Select a country...</option>
+                    <option value="South Africa">South Africa</option>
+                    <option value="Zimbabwe">Zimbabwe</option>
+                    <option value="Botswana">Botswana</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="gridLocation">Grid Pricing Location:</label>
+                <select id="gridLocation" class="form-control" required>
+                    <option value="">Select a location...</option>
+                    <option value="Coastal">Coastal</option>
+                    <option value="Inland">Inland</option>
+                </select>
+            </div>
+
+            <button type="button" id="calculateBtn" class="calculate-btn">Calculate Price</button>
+        </form>
+
+        <div id="result-container" class="result-container">
+            <h2>Price Calculation Result</h2>
+            <div id="calculation-results">
+                <!-- Results will be populated here via JavaScript -->
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Built by RUWΔIN KΞLLY</p>
+        </div>
+    </div>
+
+    <script>
+        // Pricing configuration - Updated with current 2025 prices
+        const BASE_WHOLESALE_PRICE = 18.50;  // Realistic wholesale price
+        const BASE_RETAIL_PRICE = 21.15;     // Based on current SA coastal prices (R21.14)
+        const MINIMUM_PRICE_FLOOR = 12.00;   // Realistic minimum protection
+
+        // Tier discount percentages (1-14) - matching your examples
+        const TIER_DISCOUNTS = {
+            1: 0.15,   // 15% for Premium (Tier 1)
+            2: 0.02,   // 2% (as shown in Zimbabwe example)
+            3: 0.03,   // 3%
+            4: 0.04,   // 4%
+            5: 0.05,   // 5% (as shown in first example)
+            6: 0.06,   // 6% (as shown in Botswana example)
+            7: 0.07,   // 7%
+            8: 0.08,   // 8%
+            9: 0.09,   // 9%
+            10: 0.10,  // 10%
+            11: 0.11,  // 11%
+            12: 0.12,  // 12%
+            13: 0.13,  // 13%
+            14: 0.14   // 14% (Standard)
+        };
+
+        // Local market adjustments per country - Based on 2025 pricing data
+        const LOCAL_MARKET_ADJUSTMENTS = {
+            'South Africa': 0.00,   // Base country (R21.15 coastal base)
+            'Zimbabwe': -5.65,      // Zimbabwe is cheaper (R15.50 vs R21.15 = -5.65 difference)
+            'Botswana': -6.40       // Botswana is cheaper (P14.75 ≈ R20.08 vs R21.15 = -1.07, but adjust for local factors)
+        };
+
+        // Grid location adjustments - Match C# version exactly - Updated 17-Sep-2025
+        const GRID_LOCATION_ADJUSTMENTS = {
+            'Coastal': 0.75,        // Coastal grid cost (matches C# version)
+            'Inland': 1.60          // Inland grid cost (matches C# version)
+        };
+
+        console.log('Grid adjustments loaded:', GRID_LOCATION_ADJUSTMENTS); // Debug log
+
+        // Currency conversion rates - Updated September 2025
+        const CURRENCY_RATES = {
+            'South Africa': { rate: 1.0, symbol: 'R', currency: 'ZAR' },
+            'Zimbabwe': { rate: 0.053, symbol: '$', currency: 'USD' },      // Current rate: 1 ZAR = ~0.053 USD
+            'Botswana': { rate: 0.73, symbol: 'P', currency: 'BWP' }        // Current rate: 1 ZAR = ~0.73 Pula
+        };
+
+        function calculatePrice(customerTier, country, gridLocation) {
+            const result = {
+                customerTier: customerTier,
+                country: country,
+                gridLocation: gridLocation,
+                baseWholesalePrice: BASE_WHOLESALE_PRICE,
+                baseRetailPrice: BASE_RETAIL_PRICE
+            };
+
+            // Step 1: Get tier discount
+            const discountPercentage = TIER_DISCOUNTS[customerTier] || 0;
+            result.tierDiscountPercentage = discountPercentage;
+            result.tierDiscount = BASE_RETAIL_PRICE * discountPercentage;
+
+            // Step 2: Apply local market adjustment
+            result.localMarketAdjustment = LOCAL_MARKET_ADJUSTMENTS[country] || 0;
+
+            // Step 3: Apply grid location adjustment
+            result.gridLocationAdjustment = GRID_LOCATION_ADJUSTMENTS[gridLocation] || 0;
+
+            // Step 4: Calculate final price
+            const calculatedPrice = BASE_RETAIL_PRICE 
+                                  - result.tierDiscount 
+                                  + result.localMarketAdjustment 
+                                  + result.gridLocationAdjustment;
+
+            // Step 5: Apply minimum price protection
+            result.minimumPriceProtection = MINIMUM_PRICE_FLOOR;
+            result.finalPrice = Math.max(calculatedPrice, MINIMUM_PRICE_FLOOR);
+
+            return result;
+        }
+
+        function displayResults(result) {
+            // Get currency info for the selected country
+            const currencyInfo = CURRENCY_RATES[result.country];
+            const localCurrencyPrice = result.finalPrice * currencyInfo.rate;
+            
+            // Build final price display with dual currency, showing local currency first if not South Africa
+            let finalPriceHtml = '';
+            if (result.country === 'South Africa') {
+                finalPriceHtml = `Final Calculated Price: R${result.finalPrice.toFixed(2)}`;
+            } else {
+                finalPriceHtml = `Final Calculated Price: ${currencyInfo.symbol}${localCurrencyPrice.toFixed(2)} | R${result.finalPrice.toFixed(2)}`;
+            }
+            
+            const resultsHtml = `
+                <div class="result-row">
+                    <span class="result-label">Wholesale Price</span>
+                    <span class="result-value">R${result.baseWholesalePrice.toFixed(2)}</span>
+                </div>
+                
+                <div class="result-row">
+                    <span class="result-label">Base Retail Price</span>
+                    <span class="result-value">R${result.baseRetailPrice.toFixed(2)}</span>
+                </div>
+                
+                <div class="result-row">
+                    <span class="result-label">Tier ${result.customerTier} Discount (${(result.tierDiscountPercentage * 100).toFixed(0)}%)</span>
+                    <span class="result-value discount">-R${result.tierDiscount.toFixed(2)}</span>
+                </div>
+                
+                <div class="result-row">
+                    <span class="result-label">Local Market Adjustment (${result.country})</span>
+                    <span class="result-value">${result.localMarketAdjustment >= 0 ? '+' : ''}R${result.localMarketAdjustment.toFixed(2)}</span>
+                </div>
+                
+                <div class="result-row">
+                    <span class="result-label">Grid Location Adjustment (${result.gridLocation})</span>
+                    <span class="result-value">${result.gridLocationAdjustment >= 0 ? '+' : ''}R${result.gridLocationAdjustment.toFixed(2)}</span>
+                </div>
+                
+                <div class="final-price">
+                    ${finalPriceHtml}
+                </div>
+            `;
+            
+            document.getElementById('calculation-results').innerHTML = resultsHtml;
+            document.getElementById('result-container').style.display = 'block';
+        }
+
+        document.getElementById('calculateBtn').addEventListener('click', function() {
+            const customerTier = parseInt(document.getElementById('customerTier').value);
+            const country = document.getElementById('country').value;
+            const gridLocation = document.getElementById('gridLocation').value;
+
+            // Validation
+            if (!customerTier || !country || !gridLocation) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            try {
+                const result = calculatePrice(customerTier, country, gridLocation);
+                displayResults(result);
+            } catch (error) {
+                console.error('Error calculating price:', error);
+                alert('An error occurred while calculating the price');
+            }
+        });
+    </script>
+</body>
+</html>
