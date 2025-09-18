@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini Pricing Calculator</title>
+    <!-- Version: Python Flask v1.0 - September 18, 2025 -->
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .fuel-icon {
+            font-size: 1.5rem;
+        }
+
+        .form-container {
+            padding: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #374151;
+            font-size: 1rem;
+        }
+
+        .form-group select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 1rem;
+            background: white;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group select:focus {
+            outline: none;
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .calculate-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            border: none;
+            padding: 15px 24px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .calculate-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .calculate-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .results-container {
+            margin-top: 30px;
+            padding: 25px;
+            background: #f8fafc;
+            border-radius: 12px;
+            border-left: 5px solid #6366f1;
+            display: none;
+        }
+
+        .results-container.show {
+            display: block;
+        }
+
+        .results-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 20px;
+        }
+
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .result-row:last-child {
+            border-bottom: none;
+        }
+
+        .result-label {
+            font-weight: 500;
+            color: #4b5563;
+        }
+
+        .result-value {
+            font-weight: 600;
+            color: #1f2937;
+            text-align: right;
+        }
+
+        .result-value.discount {
+            color: #ef4444;
+        }
+
+        .final-price {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-top: 20px;
+        }
+
+        .error-message {
+            background: #fef2f2;
+            color: #dc2626;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border: 1px solid #fecaca;
+            display: none;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #6b7280;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .form-container {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>
+                <span class="fuel-icon">⛽</span>
+                Mini Pricing Calculator
+            </h1>
+        </div>
+
+        <div class="form-container">
+            <form id="calculatorForm">
+                <div class="form-group">
+                    <label for="customerTier">Customer Price Tier (1-14):</label>
+                    <select id="customerTier" name="customerTier" required>
+                        <option value="">Select Tier</option>
+                        <option value="1">Tier 1 (15% discount)</option>
+                        <option value="2">Tier 2 (14% discount)</option>
+                        <option value="3">Tier 3 (13% discount)</option>
+                        <option value="4">Tier 4 (12% discount)</option>
+                        <option value="5">Tier 5 (11% discount)</option>
+                        <option value="6">Tier 6 (10% discount)</option>
+                        <option value="7">Tier 7 (9% discount)</option>
+                        <option value="8">Tier 8 (8% discount)</option>
+                        <option value="9">Tier 9 (7% discount)</option>
+                        <option value="10">Tier 10 (6% discount)</option>
+                        <option value="11">Tier 11 (5% discount)</option>
+                        <option value="12">Tier 12 (4% discount)</option>
+                        <option value="13">Tier 13 (3% discount)</option>
+                        <option value="14">Tier 14 (2% discount)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="country">Country:</label>
+                    <select id="country" name="country" required>
+                        <option value="">Select Country</option>
+                        <option value="South Africa">South Africa</option>
+                        <option value="Zimbabwe">Zimbabwe</option>
+                        <option value="Botswana">Botswana</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="gridLocation">Grid Pricing Location:</label>
+                    <select id="gridLocation" name="gridLocation" required>
+                        <option value="">Select Location</option>
+                        <option value="Coastal">Coastal</option>
+                        <option value="Inland">Inland</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="calculate-btn" id="calculateBtn">
+                    Calculate Price
+                </button>
+            </form>
+
+            <div id="errorMessage" class="error-message"></div>
+
+            <div id="resultsContainer" class="results-container">
+                <div class="results-title">Price Calculation Result</div>
+                <div id="resultsContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        console.log('=== Python Flask Mini Pricing Calculator v1.0 ===');
+        
+        document.getElementById('calculatorForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const data = {
+                customerTier: parseInt(formData.get('customerTier')),
+                country: formData.get('country'),
+                gridLocation: formData.get('gridLocation')
+            };
+            
+            // Show loading state
+            const btn = document.getElementById('calculateBtn');
+            const originalText = btn.textContent;
+            btn.textContent = 'Calculating...';
+            btn.disabled = true;
+            
+            // Hide previous results and errors
+            document.getElementById('resultsContainer').classList.remove('show');
+            document.getElementById('errorMessage').style.display = 'none';
+            
+            try {
+                const response = await fetch('/calculate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(result.error || 'Calculation failed');
+                }
+                
+                displayResults(result);
+                
+            } catch (error) {
+                showError(error.message);
+            } finally {
+                // Restore button
+                btn.textContent = originalText;
+                btn.disabled = false;
+            }
+        });
+        
+        function displayResults(data) {
+            const formatted = data.formatted;
+            const result = data.result;
+            
+            const resultsHtml = `
+                <div class="result-row">
+                    <span class="result-label">Wholesale Price:</span>
+                    <span class="result-value">${formatted.wholesalePrice}</span>
+                </div>
+                
+                <div class="result-row">
+                    <span class="result-label">Base Retail Price:</span>
+                    <span class="result-value">${formatted.baseRetailPrice}</span>
+                </div>
+                
+                <div class="result-row">
+                    <span class="result-label">Tier ${result.customerTier} Discount (${(result.tierDiscountPercentage * 100).toFixed(0)}%):</span>
+                    <span class="result-value discount">${formatted.tierDiscount}</span>
+                </div>
+                
+                <div class="result-row">
+                    <span class="result-label">Local Market Adjustment (${result.country}):</span>
+                    <span class="result-value">${formatted.localMarketAdjustment}</span>
+                </div>
+                
+                <div class="result-row">
+                    <span class="result-label">Grid Location Adjustment (${result.gridLocation}):</span>
+                    <span class="result-value">${formatted.gridLocationAdjustment}</span>
+                </div>
+                
+                <div class="final-price">
+                    Final Calculated Price: ${formatted.finalPrice}
+                </div>
+            `;
+            
+            document.getElementById('resultsContent').innerHTML = resultsHtml;
+            document.getElementById('resultsContainer').classList.add('show');
+        }
+        
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
