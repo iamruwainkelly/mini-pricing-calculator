@@ -272,8 +272,8 @@
 
     <script>
         // Pricing configuration - Updated with current 2025 prices
-        const BASE_WHOLESALE_PRICE = 18.50;  // Realistic wholesale price
-        const BASE_RETAIL_PRICE = 21.15;     // Based on current SA coastal prices (R21.14)
+        const BASE_WHOLESALE_PRICE = 18.00;  // Wholesale price - matches C# version
+        const BASE_RETAIL_PRICE = 21.50;     // Base retail price - matches C# version
         const MINIMUM_PRICE_FLOOR = 12.00;   // Realistic minimum protection
 
         // Tier discount percentages (1-14) - matching your examples
@@ -309,11 +309,11 @@
 
         console.log('Grid adjustments loaded:', GRID_LOCATION_ADJUSTMENTS); // Debug log
 
-        // Currency conversion rates - Updated September 2025
+        // Currency conversion rates - Match C# version exactly
         const CURRENCY_RATES = {
             'South Africa': { rate: 1.0, symbol: 'R', currency: 'ZAR' },
-            'Zimbabwe': { rate: 0.053, symbol: '$', currency: 'USD' },      // Current rate: 1 ZAR = ~0.053 USD
-            'Botswana': { rate: 0.73, symbol: 'P', currency: 'BWP' }        // Current rate: 1 ZAR = ~0.73 Pula
+            'Zimbabwe': { rate: 19.97, symbol: '$', currency: 'USD' },      // ZAR to USD rate (matches C#)
+            'Botswana': { rate: 1.36, symbol: 'P', currency: 'BWP' }        // ZAR to BWP rate (matches C#)
         };
 
         function calculatePrice(customerTier, country, gridLocation) {
@@ -352,40 +352,42 @@
         function displayResults(result) {
             // Get currency info for the selected country
             const currencyInfo = CURRENCY_RATES[result.country];
-            const localCurrencyPrice = result.finalPrice * currencyInfo.rate;
             
-            // Build final price display with dual currency, showing local currency first if not South Africa
+            // Convert ZAR to local currency (divide by rate, like C# version)
+            const localCurrencyPrice = result.finalPrice / currencyInfo.rate;
+            
+            // Build final price display to match C# format exactly
             let finalPriceHtml = '';
             if (result.country === 'South Africa') {
-                finalPriceHtml = `Final Calculated Price: R${result.finalPrice.toFixed(2)}`;
+                finalPriceHtml = `Final Calculated Price: R${result.finalPrice.toFixed(2)} ZAR`;
             } else {
-                finalPriceHtml = `Final Calculated Price: ${currencyInfo.symbol}${localCurrencyPrice.toFixed(2)} | R${result.finalPrice.toFixed(2)}`;
+                finalPriceHtml = `Final Calculated Price: ${currencyInfo.symbol}${localCurrencyPrice.toFixed(2)} ${currencyInfo.currency} | R${result.finalPrice.toFixed(2)} ZAR`;
             }
             
             const resultsHtml = `
                 <div class="result-row">
-                    <span class="result-label">Wholesale Price</span>
+                    <span class="result-label">Wholesale Price:</span>
                     <span class="result-value">R${result.baseWholesalePrice.toFixed(2)}</span>
                 </div>
                 
                 <div class="result-row">
-                    <span class="result-label">Base Retail Price</span>
+                    <span class="result-label">Base Retail Price:</span>
                     <span class="result-value">R${result.baseRetailPrice.toFixed(2)}</span>
                 </div>
                 
                 <div class="result-row">
-                    <span class="result-label">Tier ${result.customerTier} Discount (${(result.tierDiscountPercentage * 100).toFixed(0)}%)</span>
+                    <span class="result-label">Tier ${result.customerTier} Discount (${(result.tierDiscountPercentage * 100).toFixed(0)}%):</span>
                     <span class="result-value discount">-R${result.tierDiscount.toFixed(2)}</span>
                 </div>
                 
                 <div class="result-row">
-                    <span class="result-label">Local Market Adjustment (${result.country})</span>
-                    <span class="result-value">${result.localMarketAdjustment >= 0 ? '+' : ''}R${result.localMarketAdjustment.toFixed(2)}</span>
+                    <span class="result-label">Local Market Adjustment (${result.country}):</span>
+                    <span class="result-value">${result.localMarketAdjustment >= 0 ? '+' : ''}R${Math.abs(result.localMarketAdjustment).toFixed(2)}</span>
                 </div>
                 
                 <div class="result-row">
-                    <span class="result-label">Grid Location Adjustment (${result.gridLocation})</span>
-                    <span class="result-value">${result.gridLocationAdjustment >= 0 ? '+' : ''}R${result.gridLocationAdjustment.toFixed(2)}</span>
+                    <span class="result-label">Grid Location Adjustment (${result.gridLocation}):</span>
+                    <span class="result-value">+R${result.gridLocationAdjustment.toFixed(2)}</span>
                 </div>
                 
                 <div class="final-price">
