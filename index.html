@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mini Pricing Calculator</title>
-    <!-- Version: C# Alignment Fix v3.0 - September 17, 2025 17:45 -->
+    <!-- Version: Bug Fix v4.0 - September 18, 2025 - Fixed negative signs and grid location -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Mini Pricing Calculator</title>
     <style>
@@ -350,6 +350,11 @@
         }
 
         function displayResults(result) {
+            // Debug logging
+            console.log('Debug - Result object:', result);
+            console.log('Debug - Local Market Adjustment:', result.localMarketAdjustment);
+            console.log('Debug - Grid Location:', result.gridLocation);
+            
             // Get currency info for the selected country
             const currencyInfo = CURRENCY_RATES[result.country];
             
